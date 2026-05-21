@@ -86,10 +86,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const PHMark(size: 64, inverted: true)
+                    const PHMark(size: 64, inverted: true, monochrome: true)
                         .animate().fadeIn(duration: 600.ms).scale(delay: 200.ms),
                     const SizedBox(height: 20),
-                    const PHWordmark(size: 22, inverted: true)
+                    const PHWordmark(size: 22, inverted: true, monochrome: true)
                         .animate().fadeIn(delay: 300.ms),
                     const SizedBox(height: 8),
                     Text(

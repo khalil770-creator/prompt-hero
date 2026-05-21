@@ -111,22 +111,28 @@ class PHWordmark extends StatelessWidget {
   final bool inverted;
   final bool showMark;
 
+  /// Set to true when the wordmark sits on a mint background —
+  /// collapses the mint accent to white so nothing disappears.
+  final bool monochrome;
+
   const PHWordmark({
     super.key,
     this.size = 22,
     this.inverted = false,
     this.showMark = true,
+    this.monochrome = false,
   });
 
   @override
   Widget build(BuildContext context) {
     final ink = inverted ? Colors.white : AppColors.ink;
+    final heroColor = monochrome ? ink : AppColors.mint;
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         if (showMark) ...[
-          PHMark(size: size * 1.05, inverted: inverted),
+          PHMark(size: size * 1.05, inverted: inverted, monochrome: monochrome),
           SizedBox(width: size * 0.36),
         ],
         Text.rich(
@@ -150,7 +156,7 @@ class PHWordmark extends StatelessWidget {
                 text: 'Hero',
                 style: GoogleFonts.geist(
                   fontSize: size,
-                  color: AppColors.mint,
+                  color: heroColor,
                   fontWeight: FontWeight.w700,
                   letterSpacing: -size * 0.02,
                   height: 1,

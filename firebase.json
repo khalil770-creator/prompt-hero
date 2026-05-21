@@ -1,1 +1,30 @@
-{"flutter":{"platforms":{"dart":{"lib/firebase_options.dart":{"projectId":"prompthero-de0f4","configurations":{"android":"1:402660089849:android:e3fd35402cafb0a2d7e728","ios":"1:402660089849:ios:baa4ae686bc68689d7e728","web":"1:402660089849:web:21520fec4caa8dadd7e728"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "prompthero-de0f4",
+          "configurations": {
+            "android": "1:402660089849:android:e3fd35402cafb0a2d7e728",
+            "ios": "1:402660089849:ios:baa4ae686bc68689d7e728",
+            "web": "1:402660089849:web:21520fec4caa8dadd7e728"
+          }
+        }
+      }
+    }
+  },
+  "hosting": {
+    "public": "build/web",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "destination": "/index.html"
+      }
+    ]
+  }
+}

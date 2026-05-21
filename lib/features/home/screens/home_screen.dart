@@ -329,7 +329,7 @@ class _HomeBodyState extends ConsumerState<_HomeBody> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const PHWordmark(size: 18),
+                  const PHWordmark(size: 18, inverted: true, monochrome: true),
                   if (isAdmin)
                     Builder(
                       builder: (ctx) => IconButton(
