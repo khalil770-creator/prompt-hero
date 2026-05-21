@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import '../../../core/constants/app_constants.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../models/category_model.dart';
 
 class CategoryCard extends StatelessWidget {
@@ -16,108 +18,98 @@ class CategoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
+    final (bg, fg) = AppColors.categoryFill(category.gradientIndex);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          gradient: category.gradient,
-          borderRadius: BorderRadius.circular(16),
+          color: bg,
+          borderRadius: BorderRadius.circular(18),
           boxShadow: [
             BoxShadow(
-              color: category.gradientColors.first.withOpacity(0.3),
-              blurRadius: 12,
-              offset: const Offset(0, 4),
+              color: bg.withValues(alpha: 0.3),
+              blurRadius: 20,
+              offset: const Offset(0, 8),
             ),
           ],
         ),
-        child: Material(
-          color: Colors.transparent,
-          child: InkWell(
-            onTap: onTap,
-            borderRadius: BorderRadius.circular(16),
-            splashColor: Colors.white.withOpacity(0.1),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Container(
+              width: 38,
+              height: 38,
+              decoration: BoxDecoration(
+                color: fg == Colors.white
+                    ? Colors.white.withValues(alpha: 0.22)
+                    : Colors.black.withValues(alpha: 0.10),
+                borderRadius: BorderRadius.circular(11),
+              ),
+              child: Icon(
+                AppConstants.getIcon(category.iconName),
+                color: fg,
+                size: 20,
+              ),
+            ),
+            Flexible(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Icon container
-                  Container(
-                    width: 48,
-                    height: 48,
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Icon(
-                      category.icon,
-                      color: Colors.white,
-                      size: 26,
-                    ),
-                  ),
-                  const Spacer(),
-                  // Name
                   Text(
                     category.name,
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: fg,
+                      fontSize: 14,
                       fontWeight: FontWeight.w700,
+                      letterSpacing: -0.2,
                     ),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                   ),
-                  const SizedBox(height: 4),
-                  // Prompt count
-                  Row(
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: Text(
-                          '${category.promptCount} prompts',
-                          style: theme.textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                      const Spacer(),
-                      Container(
-                        width: 28,
-                        height: 28,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.2),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.arrow_forward_rounded,
-                          color: Colors.white,
-                          size: 14,
-                        ),
-                      ),
-                    ],
+                  const SizedBox(height: 3),
+                  Text(
+                    category.description,
+                    style: TextStyle(
+                      color: fg == Colors.white
+                          ? Colors.white.withValues(alpha: 0.78)
+                          : Colors.black.withValues(alpha: 0.65),
+                      fontSize: 11,
+                      height: 1.3,
+                    ),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    '${category.promptCount} prompts',
+                    style: TextStyle(
+                      color: fg == Colors.white
+                          ? Colors.white.withValues(alpha: 0.85)
+                          : Colors.black.withValues(alpha: 0.7),
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ],
               ),
             ),
-          ),
+          ],
         ),
       ),
     )
         .animate()
         .fadeIn(
-          delay: Duration(milliseconds: 100 * animationIndex),
-          duration: 400.ms,
+          delay: Duration(milliseconds: 80 * animationIndex),
+          duration: 350.ms,
         )
         .slideY(
-          begin: 0.2,
-          delay: Duration(milliseconds: 100 * animationIndex),
-          duration: 400.ms,
+          begin: 0.15,
+          delay: Duration(milliseconds: 80 * animationIndex),
+          duration: 350.ms,
           curve: Curves.easeOut,
         );
   }

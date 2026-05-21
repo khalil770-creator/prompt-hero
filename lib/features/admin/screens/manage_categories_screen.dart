@@ -44,11 +44,25 @@ class ManageCategoriesScreen extends ConsumerWidget {
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-            itemCount: categories.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (ctx, i) {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showAddCategoryDialog(context, ref, firestoreService),
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text('Add new category'),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                  itemCount: categories.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (ctx, i) {
               final cat = categories[i];
               return _CategoryManageCard(
                 category: cat,
@@ -77,6 +91,9 @@ class ManageCategoriesScreen extends ConsumerWidget {
                 animIndex: i,
               );
             },
+                ),
+              ),
+            ],
           );
         },
       ),

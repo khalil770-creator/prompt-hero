@@ -29,8 +29,8 @@ class PromptVaultApp extends ConsumerWidget {
     return MaterialApp.router(
       title: 'Prompt Hero',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
+      theme: AppTheme.light,
+      darkTheme: AppTheme.dark,
       themeMode: ThemeMode.system,
       routerConfig: router,
     );

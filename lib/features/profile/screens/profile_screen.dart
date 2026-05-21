@@ -32,7 +32,7 @@ class ProfileScreen extends ConsumerWidget {
           flexibleSpace: FlexibleSpaceBar(
             background: Container(
               decoration: const BoxDecoration(
-                gradient: AppColors.heroGradient,
+                color: AppColors.mint,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(24),
                   bottomRight: Radius.circular(24),

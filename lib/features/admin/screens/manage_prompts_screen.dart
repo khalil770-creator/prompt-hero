@@ -50,11 +50,25 @@ class ManagePromptsScreen extends ConsumerWidget {
             );
           }
 
-          return ListView.separated(
-            padding: const EdgeInsets.fromLTRB(20, 20, 20, 100),
-            itemCount: prompts.length,
-            separatorBuilder: (_, __) => const SizedBox(height: 8),
-            itemBuilder: (ctx, i) {
+          return Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.fromLTRB(20, 20, 20, 8),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    onPressed: () => _showAddPromptDialog(context, ref, firestoreService, prompts.length),
+                    icon: const Icon(Icons.add_rounded),
+                    label: const Text('Add new prompt'),
+                  ),
+                ),
+              ),
+              Expanded(
+                child: ListView.separated(
+                  padding: const EdgeInsets.fromLTRB(20, 0, 20, 100),
+                  itemCount: prompts.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (ctx, i) {
               final prompt = prompts[i];
               return _PromptManageCard(
                 prompt: prompt,
@@ -85,6 +99,9 @@ class ManagePromptsScreen extends ConsumerWidget {
                 animIndex: i,
               );
             },
+                ),
+              ),
+            ],
           );
         },
       ),

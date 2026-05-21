@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shimmer/shimmer.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/ph_logo.dart';
 import '../../../models/category_model.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../requests/screens/submit_request_screen.dart';
@@ -96,7 +97,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               left: 24,
               right: 24,
             ),
-            decoration: const BoxDecoration(gradient: AppColors.headerGradient),
+            decoration: const BoxDecoration(color: AppColors.mint),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -189,11 +190,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-class _HomeBody extends ConsumerWidget {
+class _HomeBody extends ConsumerStatefulWidget {
   const _HomeBody();
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_HomeBody> createState() => _HomeBodyState();
+}
+
+class _HomeBodyState extends ConsumerState<_HomeBody> {
+  final _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final categoriesAsync = ref.watch(categoriesStreamProvider);
     final filteredCategories = ref.watch(filteredCategoriesProvider);
     final isAdmin = ref.watch(isAdminProvider);
@@ -240,7 +254,7 @@ class _HomeBody extends ConsumerWidget {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12,
                 mainAxisSpacing: 12,
-                childAspectRatio: 1.1,
+                childAspectRatio: 0.85,
               ),
               delegate: SliverChildBuilderDelegate(
                 (ctx, i) => _ShimmerCategoryCard(),
@@ -272,7 +286,7 @@ class _HomeBody extends ConsumerWidget {
                   crossAxisCount: 2,
                   crossAxisSpacing: 12,
                   mainAxisSpacing: 12,
-                  childAspectRatio: 1.05,
+                  childAspectRatio: 0.85,
                 ),
                 delegate: SliverChildBuilderDelegate(
                   (ctx, i) {
@@ -295,13 +309,10 @@ class _HomeBody extends ConsumerWidget {
 
   Widget _buildHeroSection(BuildContext context, WidgetRef ref, bool isAdmin) {
     final theme = Theme.of(context);
-    final searchController = TextEditingController(
-      text: ref.read(searchQueryProvider),
-    );
 
     return Container(
       decoration: const BoxDecoration(
-        gradient: AppColors.heroGradient,
+        color: AppColors.mint,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(32),
           bottomRight: Radius.circular(32),
@@ -318,27 +329,14 @@ class _HomeBody extends ConsumerWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.auto_awesome_rounded,
-                          color: Colors.white, size: 22),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Prompt Hero',
-                        style: theme.textTheme.titleLarge?.copyWith(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ],
-                  ),
+                  const PHWordmark(size: 18),
                   if (isAdmin)
                     Builder(
                       builder: (ctx) => IconButton(
                         icon: Container(
                           padding: const EdgeInsets.all(8),
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.2),
+                            color: Colors.white.withOpacity(0.12),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(Icons.admin_panel_settings_rounded,
@@ -351,24 +349,35 @@ class _HomeBody extends ConsumerWidget {
                 ],
               ).animate().fadeIn(duration: 400.ms),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 28),
 
-              // Hero text
-              Text(
-                'Discover Powerful\nAI Prompts',
-                style: theme.textTheme.headlineMedium?.copyWith(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w800,
-                  height: 1.2,
+              // Hero text — mint background with white text
+              Text.rich(
+                TextSpan(
+                  children: [
+                    TextSpan(
+                      text: 'A library of\n',
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        color: Colors.white,
+                      ),
+                    ),
+                    TextSpan(
+                      text: 'well-crafted prompts.',
+                      style: theme.textTheme.displaySmall?.copyWith(
+                        color: Colors.white,
+                        fontStyle: FontStyle.italic,
+                      ),
+                    ),
+                  ],
                 ),
-              ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1),
+              ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.08),
 
-              const SizedBox(height: 8),
+              const SizedBox(height: 10),
 
               Text(
-                'Curated prompts for every use case — crafted for Claude AI',
+                'Curated for Claude AI — ready to copy and use.',
                 style: theme.textTheme.bodyMedium?.copyWith(
-                  color: Colors.white.withOpacity(0.85),
+                  color: Colors.white.withOpacity(0.6),
                 ),
               ).animate().fadeIn(delay: 200.ms),
 
@@ -377,31 +386,27 @@ class _HomeBody extends ConsumerWidget {
               // Search bar
               Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.white.withOpacity(0.9),
                   borderRadius: BorderRadius.circular(14),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
+                  border: Border.all(color: Colors.white.withOpacity(0.08)),
                 ),
                 child: TextField(
-                  controller: searchController,
+                  controller: _searchController,
                   onChanged: (val) {
                     ref.read(searchQueryProvider.notifier).state = val;
                   },
+                  textDirection: TextDirection.ltr,
+                  style: theme.textTheme.bodyMedium?.copyWith(color: AppColors.ink),
                   decoration: InputDecoration(
                     hintText: 'Search categories...',
                     prefixIcon: const Icon(Icons.search_rounded,
                         color: AppColors.textSecondary),
-                    suffixIcon: searchController.text.isNotEmpty
+                    suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear_rounded,
                                 color: AppColors.textSecondary),
                             onPressed: () {
-                              searchController.clear();
+                              _searchController.clear();
                               ref.read(searchQueryProvider.notifier).state = '';
                             },
                           )
@@ -411,7 +416,9 @@ class _HomeBody extends ConsumerWidget {
                     focusedBorder: InputBorder.none,
                     contentPadding:
                         const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-                    hintStyle: theme.textTheme.bodyMedium,
+                    hintStyle: theme.textTheme.bodyMedium?.copyWith(
+                      color: AppColors.textDisabled,
+                    ),
                   ),
                 ),
               ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.2),

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../providers/auth_provider.dart';
 import '../widgets/auth_text_field.dart';
+import '../../../core/widgets/ph_logo.dart';
 
 class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
@@ -70,12 +71,12 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Gradient Header
+            // Mint Header
             Container(
               width: double.infinity,
               height: size.height * 0.38,
               decoration: const BoxDecoration(
-                gradient: AppColors.heroGradient,
+                color: AppColors.mint,
                 borderRadius: BorderRadius.only(
                   bottomLeft: Radius.circular(32),
                   bottomRight: Radius.circular(32),
@@ -85,31 +86,16 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(20),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(
-                        Icons.auto_awesome_rounded,
-                        size: 48,
-                        color: Colors.white,
-                      ),
-                    ).animate().fadeIn(duration: 600.ms).scale(delay: 200.ms),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Prompt Hero',
-                      style: theme.textTheme.headlineMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.3),
+                    const PHMark(size: 64, inverted: true)
+                        .animate().fadeIn(duration: 600.ms).scale(delay: 200.ms),
+                    const SizedBox(height: 20),
+                    const PHWordmark(size: 22, inverted: true)
+                        .animate().fadeIn(delay: 300.ms),
                     const SizedBox(height: 8),
                     Text(
                       'Curated Claude AI Prompts',
                       style: theme.textTheme.bodyMedium?.copyWith(
-                        color: Colors.white.withOpacity(0.85),
+                        color: Colors.white.withOpacity(0.65),
                       ),
                     ).animate().fadeIn(delay: 400.ms),
                   ],
@@ -125,17 +111,18 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     const SizedBox(height: 8),
-                    Text(
-                      'Welcome back',
-                      style: theme.textTheme.headlineSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
+                    Text.rich(TextSpan(children: [
+                      TextSpan(
+                        text: 'Sign in to your\n',
+                        style: theme.textTheme.headlineSmall,
                       ),
-                    ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
-                    const SizedBox(height: 4),
-                    Text(
-                      'Sign in to access your prompt library',
-                      style: theme.textTheme.bodyMedium,
-                    ).animate().fadeIn(delay: 450.ms),
+                      TextSpan(
+                        text: 'vault.',
+                        style: theme.textTheme.headlineSmall?.copyWith(
+                          color: AppColors.mint,
+                        ),
+                      ),
+                    ])).animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
                     const SizedBox(height: 32),
 
                     AuthTextField(

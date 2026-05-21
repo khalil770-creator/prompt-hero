@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/utils/share_utils.dart';
 import '../../../models/prompt_model.dart';
@@ -276,27 +277,14 @@ class _PromptDetailScreenState extends ConsumerState<PromptDetailScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(color: AppColors.divider),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
-                              blurRadius: 8,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
+                          color: AppColors.surfaceAlt,
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(color: AppColors.borderSoft),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            SelectableText(
-                              displayText,
-                              style: theme.textTheme.bodyLarge?.copyWith(
-                                height: 1.7,
-                                color: theme.colorScheme.onSurface,
-                              ),
-                            ),
+                            _buildPromptText(displayText),
                             if (isLongText) ...[
                               const SizedBox(height: 8),
                               GestureDetector(
@@ -447,6 +435,45 @@ class _PromptDetailScreenState extends ConsumerState<PromptDetailScreen> {
         },
       ),
     );
+  }
+
+  Widget _buildPromptText(String text) {
+    // Highlight [PLACEHOLDER] tokens with mint background
+    final pattern = RegExp(r'\[([^\]]+)\]');
+    final spans = <InlineSpan>[];
+    int last = 0;
+    for (final match in pattern.allMatches(text)) {
+      if (match.start > last) {
+        spans.add(TextSpan(
+          text: text.substring(last, match.start),
+          style: GoogleFonts.geistMono(fontSize: 13.5, height: 1.75, color: AppColors.ink),
+        ));
+      }
+      spans.add(WidgetSpan(
+        child: Container(
+          margin: const EdgeInsets.symmetric(horizontal: 1),
+          padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+          decoration: BoxDecoration(
+            color: AppColors.mintSoft,
+            borderRadius: BorderRadius.circular(5),
+          ),
+          child: Text(
+            match.group(0)!,
+            style: GoogleFonts.geistMono(
+              fontSize: 12.5, color: AppColors.mintDeep, fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ));
+      last = match.end;
+    }
+    if (last < text.length) {
+      spans.add(TextSpan(
+        text: text.substring(last),
+        style: GoogleFonts.geistMono(fontSize: 13.5, height: 1.75, color: AppColors.ink),
+      ));
+    }
+    return SelectableText.rich(TextSpan(children: spans));
   }
 }
 
