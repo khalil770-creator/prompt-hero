@@ -45,11 +45,16 @@ class _AuthTextFieldState extends State<AuthTextField> {
       enabled: widget.enabled,
       onFieldSubmitted: widget.onFieldSubmitted,
       style: theme.textTheme.bodyLarge?.copyWith(
-        color: theme.colorScheme.onSurface,
+        color: AppColors.ink,
       ),
+      cursorColor: AppColors.mint,
       decoration: InputDecoration(
         labelText: widget.label,
         hintText: widget.hint,
+        labelStyle: TextStyle(color: AppColors.textSecondary),
+        hintStyle: TextStyle(color: AppColors.textDisabled),
+        filled: true,
+        fillColor: Colors.white,
         prefixIcon: widget.prefixIcon != null
             ? Icon(widget.prefixIcon, color: AppColors.textSecondary, size: 20)
             : null,
