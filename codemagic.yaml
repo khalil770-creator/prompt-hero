@@ -1,0 +1,44 @@
+workflows:
+  ios-workflow:
+    name: iOS Build
+    max_build_duration: 60
+    environment:
+      flutter: stable
+      xcode: latest
+      cocoapods: default
+    scripts:
+      - name: Get Flutter packages
+        script: flutter pub get
+      - name: Install pods
+        script: |
+          find . -name "Podfile" -execdir pod install \;
+      - name: Flutter build iOS (no codesign)
+        script: |
+          flutter build ios --release --no-codesign
+      - name: Build unsigned IPA
+        script: |
+          xcodebuild -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$CM_BUILD_DIR/Runner.xcarchive" \
+            archive CODE_SIGNING_ALLOWED=NO
+          xcodebuild -exportArchive \
+            -archivePath "$CM_BUILD_DIR/Runner.xcarchive" \
+            -exportPath "$CM_BUILD_DIR/ipa" \
+            -exportOptionsPlist /dev/stdin <<EOF
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+            <key>method</key>
+            <string>development</string>
+            <key>compileBitcode</key>
+            <false/>
+          </dict>
+          </plist>
+          EOF
+    artifacts:
+      - build/ios/ipa/*.ipa
+      - $CM_BUILD_DIR/ipa/*.ipa
+      - flutter_drive.log
