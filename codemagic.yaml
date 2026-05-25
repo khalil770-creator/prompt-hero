@@ -15,30 +15,24 @@ workflows:
       - name: Flutter build iOS (no codesign)
         script: |
           flutter build ios --release --no-codesign
-      - name: Build unsigned IPA
+      - name: Build archive (no codesign)
         script: |
           xcodebuild -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -sdk iphoneos \
             -archivePath "$CM_BUILD_DIR/Runner.xcarchive" \
-            archive CODE_SIGNING_ALLOWED=NO
-          xcodebuild -exportArchive \
-            -archivePath "$CM_BUILD_DIR/Runner.xcarchive" \
-            -exportPath "$CM_BUILD_DIR/ipa" \
-            -exportOptionsPlist /dev/stdin <<EOF
-          <?xml version="1.0" encoding="UTF-8"?>
-          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-          <plist version="1.0">
-          <dict>
-            <key>method</key>
-            <string>development</string>
-            <key>compileBitcode</key>
-            <false/>
-          </dict>
-          </plist>
-          EOF
+            archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY=""
+      - name: Package unsigned IPA
+        script: |
+          mkdir -p "$CM_BUILD_DIR/ipa/Payload"
+          cp -r "$CM_BUILD_DIR/Runner.xcarchive/Products/Applications/Runner.app" \
+            "$CM_BUILD_DIR/ipa/Payload/Runner.app"
+          cd "$CM_BUILD_DIR/ipa"
+          zip -r Runner.ipa Payload/
     artifacts:
-      - build/ios/ipa/*.ipa
-      - $CM_BUILD_DIR/ipa/*.ipa
+      - $CM_BUILD_DIR/ipa/Runner.ipa
       - flutter_drive.log
