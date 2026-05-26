@@ -8,32 +8,46 @@ workflows:
       flutter: stable
       xcode: latest
       cocoapods: default
-      ios_signing:
-        distribution_type: app_store
-        bundle_identifier: com.ideas.prompthero
     scripts:
-      - name: Create iOS platform files
-        script: flutter create --platforms=ios .
       - name: Get Flutter packages
         script: flutter pub get
+
+      - name: Set up keychain
+        script: keychain initialize
+
+      - name: Fetch signing files from App Store Connect
+        script: |
+          app-store-connect fetch-signing-files com.ideas.prompthero \
+            --type IOS_APP_STORE \
+            --create
+
+      - name: Add certificates to keychain
+        script: keychain add-certificates
+
+      - name: Apply provisioning profiles to Xcode project
+        script: xcode-project use-profiles
+
       - name: Install pods
         script: |
           find . -name "Podfile" -execdir pod install \;
+
       - name: Flutter build iOS
+        script: flutter build ios --release
+
+      - name: Archive and export IPA
         script: |
-          flutter build ios --release
-      - name: Build and export IPA
-        script: |
-          xcodebuild -workspace ios/Runner.xcworkspace \
+          xcodebuild \
+            -workspace ios/Runner.xcworkspace \
             -scheme Runner \
             -configuration Release \
             -sdk iphoneos \
             -archivePath "$CM_BUILD_DIR/Runner.xcarchive" \
             archive
+
           xcodebuild -exportArchive \
             -archivePath "$CM_BUILD_DIR/Runner.xcarchive" \
-            -exportOptionsPlist /dev/stdin \
-            -exportPath "$CM_BUILD_DIR/ipa" <<EOF
+            -exportPath "$CM_BUILD_DIR/ipa" \
+            -exportOptionsPlist /dev/stdin <<EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
           <plist version="1.0">
@@ -45,6 +59,7 @@ workflows:
           </dict>
           </plist>
           EOF
+
     artifacts:
       - $CM_BUILD_DIR/ipa/*.ipa
       - flutter_drive.log
