@@ -12,6 +12,8 @@ workflows:
         distribution_type: app_store
         bundle_identifier: com.ideas.prompthero
     scripts:
+      - name: Create iOS platform files
+        script: flutter create --platforms=ios .
       - name: Get Flutter packages
         script: flutter pub get
       - name: Install pods
