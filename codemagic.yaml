@@ -2,6 +2,8 @@ workflows:
   ios-workflow:
     name: iOS Signed Build
     max_build_duration: 60
+    integrations:
+      app_store_connect: Prompt Hero
     environment:
       flutter: stable
       xcode: latest
@@ -9,10 +11,6 @@ workflows:
       ios_signing:
         distribution_type: app_store
         bundle_identifier: com.ideas.prompthero
-      vars:
-        APP_STORE_CONNECT_KEY_IDENTIFIER: 5RGWY88G2A
-        APP_STORE_CONNECT_ISSUER_ID: ff3f829b-7fb6-470f-8475-4a89c54a8fbc
-        BUNDLE_ID: com.ideas.prompthero
     scripts:
       - name: Get Flutter packages
         script: flutter pub get
@@ -23,8 +21,8 @@ workflows:
         script: |
           keychain initialize
           app-store-connect fetch-signing-files \
+            com.ideas.prompthero \
             --type IOS_APP_STORE \
-            $BUNDLE_ID \
             --create
           keychain add-certificates
           xcode-project use-profiles
@@ -59,7 +57,4 @@ workflows:
       - flutter_drive.log
     publishing:
       app_store_connect:
-        api_key: $APP_STORE_CONNECT_PRIVATE_KEY
-        key_id: $APP_STORE_CONNECT_KEY_IDENTIFIER
-        issuer_id: $APP_STORE_CONNECT_ISSUER_ID
         submit_to_testflight: true
