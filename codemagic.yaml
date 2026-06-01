@@ -20,16 +20,21 @@ workflows:
           # Generate RSA private key
           openssl genrsa -out /tmp/cert_key.pem 2048
 
+          # Detect the actual keychain path set up by Codemagic
+          KEYCHAIN_PATH=$(security default-keychain | tr -d ' "')
+
+          echo "Using keychain: $KEYCHAIN_PATH"
+
           # Import key into keychain so Codemagic can pair it with the certificate
           security import /tmp/cert_key.pem \
-            -k ~/Library/Keychains/codemagic.keychain \
+            -k "$KEYCHAIN_PATH" \
             -T /usr/bin/codesign
 
           # Allow codesign to access the key without prompts
           security set-key-partition-list \
             -S apple-tool:,apple:,codesign: \
             -k "" \
-            ~/Library/Keychains/codemagic.keychain
+            "$KEYCHAIN_PATH"
 
       - name: Create iOS Distribution certificate from CSR
         script: |
