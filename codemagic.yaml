@@ -34,16 +34,16 @@ workflows:
         script: |
           find . -name "Podfile" -execdir pod install \;
 
+      - name: Flutter build iOS
+        script: flutter build ios --release
+
       - name: Create export options plist
         script: |
-          # Read profile name and team ID from the installed provisioning profile
           PROFILE_PATH=$(ls ~/Library/MobileDevice/Provisioning\ Profiles/*.mobileprovision | head -1)
           security cms -D -i "$PROFILE_PATH" > /tmp/profile.plist
           PROFILE_NAME=$(/usr/libexec/PlistBuddy -c "Print :Name" /tmp/profile.plist)
           TEAM_ID=$(/usr/libexec/PlistBuddy -c "Print :TeamIdentifier:0" /tmp/profile.plist)
-
           echo "Using profile: $PROFILE_NAME | Team: $TEAM_ID"
-
           cat > /tmp/ExportOptions.plist << EOF
           <?xml version="1.0" encoding="UTF-8"?>
           <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -64,13 +64,23 @@ workflows:
           </plist>
           EOF
 
-      - name: Flutter build IPA
+      - name: Archive and export IPA
         script: |
-          flutter build ipa --release \
-            --export-options-plist=/tmp/ExportOptions.plist
+          xcodebuild \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Release \
+            -sdk iphoneos \
+            -archivePath "$CM_BUILD_DIR/Runner.xcarchive" \
+            archive
+
+          xcodebuild -exportArchive \
+            -archivePath "$CM_BUILD_DIR/Runner.xcarchive" \
+            -exportPath "$CM_BUILD_DIR/ipa" \
+            -exportOptionsPlist /tmp/ExportOptions.plist
 
     artifacts:
-      - build/ios/ipa/*.ipa
+      - $CM_BUILD_DIR/ipa/*.ipa
       - flutter_drive.log
 
     publishing:
