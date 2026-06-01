@@ -15,44 +15,14 @@ workflows:
       - name: Set up keychain
         script: keychain initialize
 
-      - name: Generate private key and import to keychain
-        script: |
-          # Generate RSA private key
-          openssl genrsa -out /tmp/cert_key.pem 2048
+      - name: Generate private key
+        script: openssl genrsa -out /tmp/cert_key.pem 2048
 
-          # Detect the actual keychain path set up by Codemagic
-          KEYCHAIN_PATH=$(security default-keychain | tr -d ' "')
-
-          echo "Using keychain: $KEYCHAIN_PATH"
-
-          # Import key into keychain so Codemagic can pair it with the certificate
-          security import /tmp/cert_key.pem \
-            -k "$KEYCHAIN_PATH" \
-            -T /usr/bin/codesign
-
-          # Allow codesign to access the key without prompts
-          security set-key-partition-list \
-            -S apple-tool:,apple:,codesign: \
-            -k "" \
-            "$KEYCHAIN_PATH"
-
-      - name: Create iOS Distribution certificate from CSR
-        script: |
-          # Create a CSR using the private key we just generated
-          openssl req -new \
-            -key /tmp/cert_key.pem \
-            -out /tmp/cert.csr \
-            -subj "/CN=iOS Distribution/O=Prompt Hero/C=US"
-
-          # Submit CSR to Apple — creates a new certificate
-          app-store-connect create-certificate \
-            --type IOS_DISTRIBUTION \
-            --csr-path /tmp/cert.csr
-
-      - name: Fetch provisioning profile from App Store Connect
+      - name: Fetch signing files and create certificate
         script: |
           app-store-connect fetch-signing-files com.ideas.prompthero \
             --type IOS_APP_STORE \
+            --certificate-key @file:/tmp/cert_key.pem \
             --create
 
       - name: Add certificates to keychain
