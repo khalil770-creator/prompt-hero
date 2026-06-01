@@ -34,6 +34,35 @@ workflows:
         script: |
           find . -name "Podfile" -execdir pod install \;
 
+      - name: Resolve SPM packages and patch cloud_firestore Pipeline bug
+        script: |
+          # Pre-resolve SPM packages so we can patch before compilation
+          xcodebuild \
+            -workspace ios/Runner.xcworkspace \
+            -scheme Runner \
+            -resolvePackageDependencies \
+            -clonedSourcePackagesDirPath "$(pwd)/build/ios/SourcePackages"
+
+          # Patch FLTPipelineParser.m which references missing firebase-ios-sdk APIs
+          PIPELINE_FILE=$(find "$(pwd)/build/ios/SourcePackages" -name "FLTPipelineParser.m" 2>/dev/null | head -1)
+          if [ -n "$PIPELINE_FILE" ]; then
+            echo "Patching: $PIPELINE_FILE"
+            export PIPELINE_FILE
+            python3 -c "
+import re, os
+path = os.environ['PIPELINE_FILE']
+with open(path) as f:
+    content = f.read()
+content = re.sub(r'\[\[FIRCollectionSourceStageBridge alloc\] initWithRef:[^\n]+', 'nil', content)
+content = re.sub(r'\[\[FIRCollectionGroupSourceStageBridge alloc\] initWithCollectionId:[^\n]+', 'nil', content)
+with open(path, 'w') as f:
+    f.write(content)
+print('Patch applied to:', path)
+"
+          else
+            echo "FLTPipelineParser.m not found — skipping patch"
+          fi
+
       - name: Flutter build iOS
         script: flutter build ios --release
 
